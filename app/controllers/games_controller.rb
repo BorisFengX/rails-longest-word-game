@@ -8,20 +8,27 @@ class GamesController < ApplicationController
     for i in (1..7)
       @grid << @letters.sample
     end
+    @time = Time.now
   end
 
 
   def score
     @answer = params[:answer]
     @grid = params[:grid]
+    @time = params[:time]
     answer_a = @answer.upcase.split("")
-    answer_a.each do |i|
-      @in_the_grid = false unless answer_a.count(i) <= @grid.count(i)
+    if answer_a.empty?
+      @in_the_grid = false
+    else
+      answer_a.each do |i|
+          @in_the_grid = false unless answer_a.count(i) <= @grid.count(i)
+        end
     end
 
     url = "https://wagon-dictionary.herokuapp.com/#{@answer}"
     json_string = open(url).read
     dictionary = JSON.parse(json_string)
+    @time = Time.now - @time.to_time
     if @in_the_grid == false
       @result = "not in the grid"
       @score = 0
